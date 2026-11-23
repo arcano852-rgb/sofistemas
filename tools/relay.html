@@ -8,9 +8,9 @@
     var f=new URLSearchParams(location.search).get('f');
     var r=await fetch('https://raw.githubusercontent.com/arcano852-rgb/sofistemas/videos-temp/v/'+encodeURIComponent(f));
     var buf=await r.arrayBuffer();
-    var target=window.opener;
+    var target=window.opener|| (window.parent!==window?window.parent:null);
     if(!target){s.textContent='sin opener';return;}
-    target.postMessage({sofiRelay:true,name:f,buf:buf},'https://business.facebook.com',[buf]);
+    target.postMessage({sofiRelay:true,name:f,buf:buf},'*',[buf]);
     s.textContent='Enviado '+f;
     setTimeout(function(){window.close();},1500);
   }catch(e){s.textContent='error '+e.message;}
