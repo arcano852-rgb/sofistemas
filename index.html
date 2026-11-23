@@ -210,6 +210,22 @@
   .cta-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
   .hours { margin-top: 18px !important; margin-bottom: 0 !important; font-size: 14px !important; color: #9fb0d0 !important; }
 
+  /* Videos demo */
+  .vid-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 352px)); justify-content: center; gap: 20px; }
+  .vid { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; }
+  .vid-frame { position: relative; aspect-ratio: 16/9; background: var(--navy); }
+  .vid-frame iframe, .vid-frame img { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; object-fit: cover; }
+  .vid-play { position: absolute; inset: 0; width: 100%; border: 0; cursor: pointer; background: transparent; display: grid; place-items: center; }
+  .vid-play span { width: 68px; height: 68px; border-radius: 50%; background: rgba(11,23,48,.78); display: grid; place-items: center; transition: transform .15s, background .15s; }
+  .vid-play span::before { content: ""; border-style: solid; border-width: 13px 0 13px 21px; border-color: transparent transparent transparent #fff; margin-left: 5px; }
+  .vid-play:hover span { transform: scale(1.08); background: var(--blue); }
+  .vid-body { padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .vid-body .name { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
+  .vid-body h3 { font-size: 17px; }
+  .vid-body .go { margin-top: auto; padding-top: 10px; font-weight: 600; font-size: 15px; color: var(--wa-dark); display: flex; align-items: center; gap: 8px; }
+  .vid-body .go svg { width: 18px; height: 18px; }
+  @media (max-width: 560px) { .vid-grid { grid-template-columns: 1fr; } }
+
   footer { padding: 36px 0 100px; color: var(--muted); font-size: 14px; text-align: center; }
   footer img { height: 54px; width: auto; margin: 0 auto 14px; display: block; }
   footer a { color: var(--ink); font-weight: 600; }
@@ -262,6 +278,7 @@
     <a href="#" class="brand"><img src="img/logo.png" width="150" height="46" alt="Sofistemas - Seguridad y tecnología a tu alcance"></a>
     <nav class="nav-links" aria-label="Secciones">
       <a href="#negocios">Sistemas POS</a>
+      <a href="#videos" id="nav-videos" hidden>Videos</a>
       <a href="#funciones">Funciones</a>
       <a href="#camaras">Cámaras</a>
       <a href="#preguntas">Preguntas</a>
@@ -403,6 +420,18 @@
   </div>
 </section>
 
+<!-- VIDEOS DEMO (se muestra solo cuando hay al menos un video cargado en VIDEOS, abajo en el script) -->
+<section id="videos" class="alt" hidden>
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="tag">Míralo funcionando</span>
+      <h2>Videos de Mostrador POS</h2>
+      <p>Mira cómo trabaja el sistema en un negocio como el tuyo. Si te gusta, pide tu demo en vivo por WhatsApp.</p>
+    </div>
+    <div class="vid-grid" id="vid-grid"></div>
+  </div>
+</section>
+
 <!-- FUNCIONES -->
 <section id="funciones" class="alt">
   <div class="wrap">
@@ -518,6 +547,65 @@
 </a>
 
 <script>
+  /* ===== VIDEOS DE MOSTRADOR =====
+     Para poner un video: sube el video a YouTube y pega el enlace entre las comillas
+     de su versión, por ejemplo:  yt: "https://youtu.be/AbCdEfGhIjK"
+     Sirven enlaces normales, youtu.be y de YouTube Shorts.
+     Las versiones sin enlace no se muestran; si ninguna tiene enlace, la sección queda oculta. */
+  var VIDEOS = [
+    { nombre: "Mostrador Restaurante", titulo: "Restaurantes y cafeterías", yt: "" },
+    { nombre: "Mostrador Tienda",      titulo: "Tiendas y minimercados",    yt: "" },
+    { nombre: "Mostrador Farmacia",    titulo: "Farmacias y droguerías",    yt: "" },
+    { nombre: "Mostrador Ropa",        titulo: "Almacenes de ropa",         yt: "" },
+    { nombre: "Mostrador Bisutería",   titulo: "Accesorios y bisutería",    yt: "" },
+    { nombre: "Mostrador Carnicería",  titulo: "Carnicerías",               yt: "" },
+    { nombre: "Mostrador Parqueadero", titulo: "Parqueaderos",              yt: "" },
+    { nombre: "Mostrador Hotel",       titulo: "Hoteles y hospedajes",      yt: "" },
+    { nombre: "Mostrador Taller",      titulo: "Talleres",                  yt: "" }
+  ];
+
+  (function () {
+    function ytId(u) {
+      var m = String(u || "").match(/(?:youtu\.be\/|v=|\/shorts\/|\/embed\/|\/live\/)([A-Za-z0-9_-]{11})/);
+      if (m) return m[1];
+      return /^[A-Za-z0-9_-]{11}$/.test(u) ? u : "";
+    }
+    var grid = document.getElementById("vid-grid");
+    var n = 0;
+    VIDEOS.forEach(function (v) {
+      var id = ytId(v.yt);
+      if (!id) return;
+      n++;
+      var card = document.createElement("div");
+      card.className = "vid";
+      card.innerHTML =
+        '<div class="vid-frame">' +
+          '<img src="https://i.ytimg.com/vi/' + id + '/hqdefault.jpg" alt="" loading="lazy">' +
+          '<button class="vid-play" type="button" aria-label="Reproducir video de ' + v.nombre + '"><span></span></button>' +
+        '</div>' +
+        '<div class="vid-body">' +
+          '<span class="name">' + v.nombre + '</span>' +
+          '<h3>' + v.titulo + '</h3>' +
+          '<a class="go" target="_blank" rel="noopener" data-wa="' + v.nombre + '">Quiero esta demo <svg><use href="#arrow"/></svg></a>' +
+        '</div>';
+      card.querySelector(".vid-play").addEventListener("click", function () {
+        var f = document.createElement("iframe");
+        f.src = "https://www.youtube-nocookie.com/embed/" + id + "?autoplay=1&rel=0";
+        f.title = "Video " + v.nombre;
+        f.allow = "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture";
+        f.allowFullscreen = true;
+        var box = card.querySelector(".vid-frame");
+        box.innerHTML = "";
+        box.appendChild(f);
+      });
+      grid.appendChild(card);
+    });
+    if (n) {
+      document.getElementById("videos").hidden = false;
+      document.getElementById("nav-videos").hidden = false;
+    }
+  })();
+
   var NUM = "573127396068";
   var BASE = "Hola Sofistemas, vi su página web y ";
   var MSG = {
